@@ -19,7 +19,7 @@ const SignupPage = () => {
   } = useForm();
 
   const [roleOpen, setRoleOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("attendee");
+  const [selectedRole, setSelectedRole] = useState("passenger");
 
   const onSubmit = async (data) => {
     const imageFile = data.image[0];
@@ -31,6 +31,7 @@ const SignupPage = () => {
         email: data.email,
         password: data.password,
         image: imageUrl,
+        role: selectedRole,
       });
 
     if (signupError) {
@@ -131,8 +132,7 @@ const SignupPage = () => {
               >
                 <label
                   htmlFor="email"
-                  className="text-xs
-                   font-black uppercase tracking-wider text-[#124170] dark:text-[#AAFFC7] flex items-center gap-1.5"
+                  className="text-xs font-black uppercase tracking-wider text-[#124170] dark:text-[#AAFFC7] flex items-center gap-1.5"
                 >
                   <FaEnvelope className="text-[10px]" />
                   Email Address
@@ -253,7 +253,7 @@ const SignupPage = () => {
                     onClick={() => setRoleOpen((prev) => !prev)}
                     className="w-full h-10 bg-white dark:bg-[#0d2e4d] text-gray-700 dark:text-gray-200 border border-gray-200/40 dark:border-white/5 rounded-xl px-3 pr-8 text-xs font-semibold text-left focus:outline-none focus:ring-1 focus:ring-[#124170]/30 dark:focus:ring-[#67C090]/30 focus:border-[#124170] dark:focus:border-[#67C090] cursor-pointer transition-all duration-200"
                   >
-                    {selectedRole === "attendee" ? "Passenger" : "Operator"}
+                    {selectedRole === "passenger" ? "Passenger" : "Vendor"}
                   </button>
                   <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none text-gray-400 text-[8px]">
                     {roleOpen ? "▲" : "▼"}
@@ -263,8 +263,8 @@ const SignupPage = () => {
                   {roleOpen && (
                     <div className="absolute z-50 top-[calc(100%+4px)] left-0 w-full bg-white dark:bg-[#0d2e4d] border border-gray-200/40 dark:border-white/5 rounded-xl overflow-hidden shadow-lg">
                       {[
-                        { value: "attendee", label: "Passenger" },
-                        { value: "organizer", label: "Operator" },
+                        { value: "passenger", label: "Passenger" },
+                        { value: "vendor", label: "Vendor" },
                       ].map((opt) => (
                         <div
                           key={opt.value}

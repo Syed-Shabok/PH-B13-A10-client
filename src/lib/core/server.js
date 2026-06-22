@@ -15,5 +15,8 @@ export const serverFetch = async (path) => {
   const res = await fetch(`${baseUrl}${path}`, {
     cache: "no-store",
   });
+
+  // console.log("Server Fetch res: ", res);
+
   return res.json();
 };

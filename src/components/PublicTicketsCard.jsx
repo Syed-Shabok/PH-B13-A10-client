@@ -27,12 +27,10 @@ const PublicTicketCard = ({ ticket }) => {
   const currentType = ticket?.transportType;
 
   const badgeStyles = {
-    Bus: "bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30",
-    Train: "bg-blue-500/20 text-blue-700 dark:text-blue-300 border-blue-500/30",
-    Flight:
-      "bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-500/30",
-    Launch:
-      "bg-[#67C090]/20 text-[#124170] dark:text-[#AAFFC7] border-[#67C090]/30",
+    Bus: "bg-amber-500/60 text-amber-900  border-amber-900",
+    Train: "bg-blue-500/60 text-blue-900  border-blue-900",
+    Flight: "bg-purple-500/60 text-purple-900  border-purple-900",
+    Launch: "bg-[#67C090]/60 text-green-900  border-green-900",
   };
 
   return (
@@ -54,7 +52,7 @@ const PublicTicketCard = ({ ticket }) => {
 
           {/* Floating Sector Vector Mode Badge */}
           <span
-            className={`absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-black uppercase tracking-widest border rounded-full select-none backdrop-blur-xl shadow-sm
+            className={`absolute top-4 right-4 inline-flex items-center gap-1.5 px-3 py-1 text-xs font-extrabold uppercase tracking-widest border rounded-full select-none backdrop-blur-xl shadow-sm
             ${badgeStyles[ticket?.transportType]}     
             `}
           >

@@ -95,8 +95,11 @@ export const VendorTicketCard = ({ ticket, onEditClick, onDeleteSuccess }) => {
             <motion.div whileTap={isRejected ? {} : { scale: 0.97 }}>
               <Button
                 size="sm"
-                disabled={isRejected}
-                onClick={onEditClick}
+                isDisabled={isRejected}
+                onClick={() => {
+                  if (isRejected) return;
+                  onEditClick();
+                }}
                 className={`w-full font-bold text-xs uppercase tracking-wider rounded-xl transition-all ${
                   isRejected
                     ? "bg-zinc-200 dark:bg-[#0b1d30]/40 text-zinc-400 dark:text-zinc-600 cursor-not-allowed opacity-50"

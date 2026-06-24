@@ -24,7 +24,7 @@ export function DeleteAlertButton({ ticket, isRejected, onDeleteSuccess }) {
     <AlertDialog>
       <Button
         size="sm"
-        disabled={isRejected}
+        isDisabled={isRejected}
         className="w-full font-bold text-xs uppercase tracking-wider rounded-xl transition-all bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20"
       >
         <FaTrash className="mr-1" /> Delete

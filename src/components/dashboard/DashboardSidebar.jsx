@@ -49,10 +49,10 @@ const DashboardSidebar = () => {
       href: "/dashboard/vendor",
     },
     {
-      key: "add-ticket",
-      label: "Add Ticket",
+      key: "add-tickets",
+      label: "Add Tickets",
       icon: FaPlus,
-      href: "/dashboard/vendor/add-ticket",
+      href: "/dashboard/vendor/add-tickets",
     },
     {
       key: "my-added-tickets",

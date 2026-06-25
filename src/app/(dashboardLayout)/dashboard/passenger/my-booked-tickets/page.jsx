@@ -14,30 +14,6 @@ export default async function MyBookedTicketsPage() {
 
   console.log("Bookings in passenger Dashboard: ", bookings);
 
-  // const handleBookTicket = async () => {
-  //   const paymentData = {
-  //     paymentAmount:
-
-  //     ticketPrice: ticketPrice.toFixed(2),
-  //     eventId,
-  //     eventTitle,
-  //     quantity,
-  //   };
-
-  //   const res = await fetch("/api/checkout_sessions", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(paymentData),
-  //   });
-  //   const data = await res.json();
-  //   // console.log(data);
-  //   if (data?.url) {
-  //     window.location.href = data.url;
-  //   }
-  // };
-
   return (
     <div className="p-6">
       <DashboardHeading

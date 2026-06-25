@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -8,15 +7,18 @@ import { useSession } from "@/lib/auth-client";
 import { addTickets } from "@/lib/actions/tickets";
 import { uploadImage } from "@/utils/uploadImage";
 import { motion } from "framer-motion";
-
 import { Button, Card, CardHeader, Input, Form, Label } from "@heroui/react";
-import { FaImage, FaPlane, FaBus, FaTrain, FaShip } from "react-icons/fa";
+import { FaBan, FaTicketAlt } from "react-icons/fa";
 import DashboardHeading from "@/components/dashboard/DashboardHeading";
 
 const AddTicketPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // New States for Security Check
+  const [isVendorBlocked, setIsVendorBlocked] = useState(false);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
   const TRANSPORT_TYPES = ["Bus", "Train", "Flight", "Launch"];
   const AVAILABLE_PERKS = [
@@ -39,8 +41,32 @@ const AddTicketPage = () => {
     },
   });
 
-  // Keep track of active perks array
   const selectedPerks = watch("perks");
+
+  // Client-Side Security Check on Mount
+  useEffect(() => {
+    const checkVendorStatus = async () => {
+      if (session?.user?.email) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/users/${session.user.email}`,
+          );
+          const userData = await res.json();
+          if (userData?.isBlocked) {
+            setIsVendorBlocked(true);
+          }
+        } catch (error) {
+          console.error("Failed to verify vendor status:", error);
+        } finally {
+          setIsLoadingStatus(false);
+        }
+      } else if (session === null) {
+        setIsLoadingStatus(false); // Done loading session, user is not logged in
+      }
+    };
+
+    checkVendorStatus();
+  }, [session]);
 
   const handlePerkChange = (perk, isChecked) => {
     if (isChecked) {
@@ -56,8 +82,6 @@ const AddTicketPage = () => {
   const onSubmit = async (data) => {
     try {
       setIsSubmitting(true);
-
-      // Handle Image uploading via ImgBB helper script
       const imageFile = data.ticketImage[0];
       if (!imageFile) {
         toast.error("Please choose a ticket display image.");
@@ -73,7 +97,6 @@ const AddTicketPage = () => {
         return;
       }
 
-      // Format complete payload with explicit assignment instructions
       const ticketPayload = {
         title: data.title,
         from: data.from,
@@ -86,10 +109,16 @@ const AddTicketPage = () => {
         image: imageUrl,
         vendorName: session?.user?.name || "Tikify Vendor",
         vendorEmail: session?.user?.email,
-        status: "pending", // Mandatory starting lifecycle hook requirement
+        status: "pending",
       };
 
       const result = await addTickets(ticketPayload);
+
+      // Catch the backend 403 security rejection
+      if (result?.error) {
+        toast.error(result.error);
+        return;
+      }
 
       if (result && (result.insertedId || result.acknowledged)) {
         toast.success("Ticket posted successfully! Awaiting verification.");
@@ -128,15 +157,52 @@ const AddTicketPage = () => {
     },
   };
 
+  // Render Loader while checking security status
+  if (isLoadingStatus) {
+    return (
+      <div className="min-h-[85vh] flex items-center justify-center bg-slate-50 dark:bg-[#091624]">
+        <div className="w-12 h-12 border-4 border-[#00ADB5] border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // Render Restricted UI if Vendor is Fraudulent
+  if (isVendorBlocked) {
+    return (
+      <div className="min-h-[85vh] w-full bg-slate-50 dark:bg-[#091624] px-6 py-12 relative overflow-hidden transition-colors duration-300">
+        <DashboardHeading
+          title="Add Ticket"
+          description="List and distribute custom transport or passage tickets."
+        />
+
+        <div className="mt-12 relative z-10 flex flex-col items-center justify-center p-10 md:p-16 border border-red-500/30 rounded-3xl bg-red-500/5 backdrop-blur-xl max-w-2xl mx-auto text-center shadow-[0_0_50px_-12px_rgba(239,68,68,0.15)]">
+          <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-6 border border-red-500/20">
+            <FaBan className="text-red-500 text-4xl" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-widest mb-3">
+            Account Restricted
+          </h2>
+          <p className="text-zinc-400 font-medium text-sm md:text-base leading-relaxed">
+            Your vendor account has been flagged for fraudulent activity. You
+            are permanently restricted from listing new tickets or managing
+            inventory on this platform.
+          </p>
+        </div>
+
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-red-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#091624] rounded-full blur-3xl pointer-events-none" />
+      </div>
+    );
+  }
+
+  // Original Form UI
   return (
-    // Base container updated from zinc-950 to a deep custom slate-navy tint
     <div className="min-h-[85vh] w-full bg-slate-50 dark:bg-[#091624] px-6 py-12 relative overflow-hidden transition-colors duration-300">
       <DashboardHeading
         title="Add Ticket"
         description="List and distribute custom transport or passage tickets."
       />
 
-      {/* Main Structural Content Glass Container applied to form wrapper */}
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -147,7 +213,6 @@ const AddTicketPage = () => {
           className="w-full bg-white/70 dark:bg-[#124170]/20 backdrop-blur-xl rounded-3xl border border-zinc-200/60 dark:border-[#1a3d61] shadow-2xl transition-all duration-300"
           radius="lg"
         >
-          {/* Card Header matching project title aesthetics */}
           <CardHeader className="flex flex-col gap-1 pb-4 border-b border-zinc-200/60 dark:border-[#1a3d61]/60 p-8 select-none">
             <motion.h3
               variants={itemVariants}
@@ -169,7 +234,6 @@ const AddTicketPage = () => {
               onSubmit={handleSubmit(onSubmit)}
               className="space-y-6 w-full"
             >
-              {/* Ticket Title */}
               <motion.div variants={itemVariants} className="w-full">
                 <Label
                   htmlFor="title"
@@ -192,7 +256,6 @@ const AddTicketPage = () => {
                 )}
               </motion.div>
 
-              {/* Transit Vectors (From -> To) */}
               <motion.div
                 variants={itemVariants}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"
@@ -242,7 +305,6 @@ const AddTicketPage = () => {
                 </div>
               </motion.div>
 
-              {/* Transport Matrix + Time Profiles */}
               <motion.div
                 variants={itemVariants}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"
@@ -308,7 +370,6 @@ const AddTicketPage = () => {
                 </div>
               </motion.div>
 
-              {/* Financial metrics & Inventory Controls */}
               <motion.div
                 variants={itemVariants}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full"
@@ -368,7 +429,6 @@ const AddTicketPage = () => {
                 </div>
               </motion.div>
 
-              {/* Perks Checklist Arrays */}
               <motion.div
                 variants={itemVariants}
                 className="w-full border-t border-b border-zinc-200/60 dark:border-[#1a3d61]/80 py-6"
@@ -382,12 +442,11 @@ const AddTicketPage = () => {
                     return (
                       <label
                         key={perk}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-full border cursor-pointer transition-all text-xs font-black uppercase tracking-widest select-none
-                          ${
-                            isChecked
-                              ? "border-[#67C090] bg-[#67C090]/10 text-[#124170] dark:text-[#AAFFC7]"
-                              : "border-zinc-200/60 dark:border-[#1a3d61] bg-zinc-50 dark:bg-[#0b1d30]/50 text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-[#1a3d61]"
-                          }`}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-full border cursor-pointer transition-all text-xs font-black uppercase tracking-widest select-none ${
+                          isChecked
+                            ? "border-[#67C090] bg-[#67C090]/10 text-[#124170] dark:text-[#AAFFC7]"
+                            : "border-zinc-200/60 dark:border-[#1a3d61] bg-zinc-50 dark:bg-[#0b1d30]/50 text-zinc-500 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-[#1a3d61]"
+                        }`}
                       >
                         <input
                           type="checkbox"
@@ -398,12 +457,11 @@ const AddTicketPage = () => {
                           }
                         />
                         <span
-                          className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 transition-all
-                            ${
-                              isChecked
-                                ? "border-[#67C090] bg-[#67C090]"
-                                : "border-zinc-300 dark:border-[#1a3d61] bg-white dark:bg-[#0b1d30]"
-                            }`}
+                          className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 transition-all ${
+                            isChecked
+                              ? "border-[#67C090] bg-[#67C090]"
+                              : "border-zinc-300 dark:border-[#1a3d61] bg-white dark:bg-[#0b1d30]"
+                          }`}
                         >
                           {isChecked && (
                             <svg
@@ -423,7 +481,6 @@ const AddTicketPage = () => {
                 </div>
               </motion.div>
 
-              {/* Image Upload Component Box Container */}
               <motion.div variants={itemVariants} className="w-full py-2">
                 <Label
                   htmlFor="ticketImage"
@@ -448,7 +505,6 @@ const AddTicketPage = () => {
                 )}
               </motion.div>
 
-              {/* Readonly Vendor Verification Coordinates */}
               <motion.div
                 variants={itemVariants}
                 className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full bg-zinc-50 dark:bg-[#124170]/10 p-6 rounded-2xl border border-zinc-200/60 dark:border-[#1a3d61]/60 mt-4 select-none"
@@ -475,7 +531,6 @@ const AddTicketPage = () => {
                 </div>
               </motion.div>
 
-              {/* CTA Action Submission Trigger */}
               <motion.div
                 variants={itemVariants}
                 className="flex items-center justify-start pt-6 border-t border-zinc-200/60 dark:border-[#1a3d61]/60 mt-4"
@@ -494,7 +549,6 @@ const AddTicketPage = () => {
         </Card>
       </motion.div>
 
-      {/* Decorative Background Ambient Orbs */}
       <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#AAFFC7]/10 dark:bg-[#67C090]/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#67C090]/10 dark:bg-[#AAFFC7]/5 rounded-full blur-3xl pointer-events-none" />
     </div>

@@ -22,3 +22,11 @@ export const getTicketById = async (id) => {
   const result = await serverFetch(`/api/tickets/${id}`);
   return result;
 };
+
+export const getAdvertisedTickets = async () => {
+  return await serverFetch("/api/tickets/advertised");
+};
+
+export const getLatestTickets = async () => {
+  return await serverFetch("/api/tickets/latest");
+};

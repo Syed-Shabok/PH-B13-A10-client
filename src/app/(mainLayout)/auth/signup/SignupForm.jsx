@@ -8,7 +8,14 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaLock, FaImage, FaUserCog } from "react-icons/fa";
+import {
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaImage,
+  FaUserCog,
+  FaGoogle,
+} from "react-icons/fa";
 import Link from "next/link";
 
 export default function SignupForm() {
@@ -26,12 +33,22 @@ export default function SignupForm() {
   const [selectedRole, setSelectedRole] = useState("passenger");
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleGoogleSignin = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: callbackUrl,
+      });
+    } catch (error) {
+      toast.error("Google authentication failed.");
+    }
+  };
+
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
       const imageFile = data.image[0];
       const imageUrl = await uploadImage(imageFile);
-
       const { data: signupData, error: signupError } =
         await authClient.signUp.email({
           name: data.name,
@@ -40,7 +57,6 @@ export default function SignupForm() {
           image: imageUrl,
           role: selectedRole,
         });
-
       if (signupError) {
         toast.error(signupError.message || "Registration Failed");
       } else {
@@ -99,7 +115,6 @@ export default function SignupForm() {
             Join Tikify to explore modern ticketing networks across Bangladesh.
           </motion.p>
         </div>
-
         <CardBody className="gap-0 p-0">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full">
             <motion.div
@@ -124,7 +139,6 @@ export default function SignupForm() {
                 </span>
               )}
             </motion.div>
-
             <motion.div
               variants={itemVariants}
               className="flex flex-col gap-1.5"
@@ -154,7 +168,6 @@ export default function SignupForm() {
                 </span>
               )}
             </motion.div>
-
             <motion.div
               variants={itemVariants}
               className="flex flex-col gap-1.5"
@@ -178,7 +191,6 @@ export default function SignupForm() {
                 </span>
               )}
             </motion.div>
-
             <motion.div
               variants={itemVariants}
               className="flex flex-col gap-1.5"
@@ -216,7 +228,6 @@ export default function SignupForm() {
                 </span>
               )}
             </motion.div>
-
             <motion.div
               variants={itemVariants}
               className="flex flex-col gap-1.5"
@@ -229,7 +240,6 @@ export default function SignupForm() {
                 {...register("role", { required: "Role is required" })}
                 value={selectedRole}
               />
-
               <div className="relative w-full">
                 <button
                   type="button"
@@ -267,7 +277,6 @@ export default function SignupForm() {
                 </span>
               )}
             </motion.div>
-
             <motion.div
               variants={itemVariants}
               className="pt-2"
@@ -283,6 +292,34 @@ export default function SignupForm() {
               </Button>
             </motion.div>
           </form>
+
+          {/* Visual Divider Segment */}
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center my-5 select-none"
+          >
+            <div className="flex-grow h-px bg-zinc-200 dark:bg-white/10" />
+            <span className="px-3 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              OR
+            </span>
+            <div className="flex-grow h-px bg-zinc-200 dark:bg-white/10" />
+          </motion.div>
+
+          {/* Google Signup Trigger */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.015 }}
+            whileTap={{ scale: 0.985 }}
+          >
+            <Button
+              type="button"
+              onPress={handleGoogleSignin}
+              startContent={<FaGoogle size={12} />}
+              className="w-full h-11 text-xs font-bold tracking-wider uppercase bg-white dark:bg-[#0b1d30] hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 rounded-full shadow-sm transition-colors"
+            >
+              Sign Up With Google
+            </Button>
+          </motion.div>
 
           <motion.p
             variants={itemVariants}

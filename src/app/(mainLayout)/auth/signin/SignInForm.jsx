@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
-import { FaEnvelope, FaLock } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaGoogle } from "react-icons/fa";
 import Link from "next/link";
 
 export default function SignInForm() {
@@ -20,8 +20,18 @@ export default function SignInForm() {
     handleSubmit,
     formState: { errors },
   } = useForm();
-
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleGoogleSignin = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: callbackUrl,
+      });
+    } catch (error) {
+      toast.error("Google authentication failed.");
+    }
+  };
 
   const onSubmit = async (data) => {
     setIsLoading(true);
@@ -31,7 +41,6 @@ export default function SignInForm() {
           email: data.email,
           password: data.password,
         });
-
       if (signInError) {
         toast.error(signInError.message || "Invalid credentials");
       } else {
@@ -90,7 +99,6 @@ export default function SignInForm() {
             Sign in to manage your tickets and journeys.
           </motion.p>
         </div>
-
         <CardBody className="gap-0 p-0">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full">
             <motion.div
@@ -112,7 +120,6 @@ export default function SignInForm() {
                 </span>
               )}
             </motion.div>
-
             <motion.div
               variants={itemVariants}
               className="flex flex-col gap-1.5"
@@ -148,6 +155,34 @@ export default function SignInForm() {
               </Button>
             </motion.div>
           </form>
+
+          {/* Visual Divider Segment */}
+          <motion.div
+            variants={itemVariants}
+            className="flex items-center my-5 select-none"
+          >
+            <div className="flex-grow h-px bg-zinc-200 dark:bg-white/10" />
+            <span className="px-3 text-[10px] font-black uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              OR
+            </span>
+            <div className="flex-grow h-px bg-zinc-200 dark:bg-white/10" />
+          </motion.div>
+
+          {/* Google Login Trigger */}
+          <motion.div
+            variants={itemVariants}
+            whileHover={{ scale: 1.015 }}
+            whileTap={{ scale: 0.985 }}
+          >
+            <Button
+              type="button"
+              onPress={handleGoogleSignin}
+              startContent={<FaGoogle size={12} />}
+              className="w-full h-11 text-xs font-bold tracking-wider uppercase bg-white dark:bg-[#0b1d30] hover:bg-zinc-100 dark:hover:bg-white/5 border border-zinc-200 dark:border-white/5 text-zinc-700 dark:text-zinc-200 rounded-full shadow-sm transition-colors"
+            >
+              Continue With Google
+            </Button>
+          </motion.div>
 
           <motion.p
             variants={itemVariants}

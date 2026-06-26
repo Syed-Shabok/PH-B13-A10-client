@@ -115,10 +115,10 @@ const DashboardSidebar = () => {
       href: "/dashboard/admin/manage-users",
     },
     {
-      key: "advertise-tickets",
+      key: "advertise-ticket",
       label: "Advertise Tickets",
       icon: RiAdvertisementFill,
-      href: "/dashboard/admin/advertise-tickets",
+      href: "/dashboard/admin/advertise-ticket",
     },
   ];
 

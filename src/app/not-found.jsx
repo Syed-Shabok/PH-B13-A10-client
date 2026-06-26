@@ -30,7 +30,7 @@ const NotFound = () => {
   };
 
   return (
-    <main className="min-h-[85vh] w-full bg-white dark:bg-[#124170] flex flex-col items-center justify-center px-6 relative overflow-hidden transition-colors duration-300">
+    <main className="min-h-screen w-full bg-white dark:bg-[#124170] flex flex-col items-center justify-center px-6 relative overflow-hidden transition-colors duration-300">
       {/* Dynamic Animated Background Ambient Orbs */}
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}

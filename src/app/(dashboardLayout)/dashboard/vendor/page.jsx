@@ -1,6 +1,6 @@
 import { getUserSession } from "@/lib/core/session";
 import DashboardHeading from "@/components/dashboard/DashboardHeading";
-import ProfileClient from "@/components/dashboard/ProfileClient"; // Adjust path if needed
+import ProfileClient from "@/components/dashboard/ProfileClient";
 
 const ProfilePage = async () => {
   const session = await getUserSession();

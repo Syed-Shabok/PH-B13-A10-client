@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@heroui/react";
-import { updateTicketStatus, toggleTicketAdvertisement } from "@/lib/api/admin"; // <-- Imported the Server Action
+import { updateTicketStatus } from "@/lib/api/admin";
 import toast from "react-hot-toast";
 import {
   FaCheck,
@@ -11,27 +11,16 @@ import {
   FaTag,
   FaCalendarAlt,
   FaCalendarPlus,
-  FaBullhorn,
-  FaStar,
 } from "react-icons/fa";
 
-export default function ManageTicketsClient({ initialTickets }) {
+export default function TicketAdvertisementClient({ initialTickets }) {
   const [tickets, setTickets] = useState(initialTickets);
-
-  // Separate loading states so buttons don't block each other globally
   const [processingId, setProcessingId] = useState(null);
-  const [adProcessingId, setAdProcessingId] = useState(null);
 
-  // 1. Existing Status Handler
   const handleStatusChange = async (id, newStatus) => {
     try {
       setProcessingId(id);
       const res = await updateTicketStatus(id, newStatus);
-
-      if (res.error) {
-        toast.error(res.error);
-        return;
-      }
 
       if (res.modifiedCount > 0 || res.matchedCount > 0) {
         toast.success(`Ticket marked as ${newStatus}`);
@@ -48,44 +37,6 @@ export default function ManageTicketsClient({ initialTickets }) {
       toast.error("A network error occurred.");
     } finally {
       setProcessingId(null);
-    }
-  };
-
-  // 2. New Advertisement Toggle Handler
-  const handleAdvertiseToggle = async (id, currentAdStatus) => {
-    try {
-      setAdProcessingId(id);
-      const newAdStatus = !currentAdStatus; // Flip the boolean
-
-      const res = await toggleTicketAdvertisement(id, newAdStatus);
-
-      // Handle backend business logic errors (like the "Max 6 tickets" limit)
-      if (res.error || res.message) {
-        toast.error(res.message || res.error);
-        return;
-      }
-
-      if (res.modifiedCount > 0 || res.matchedCount > 0) {
-        toast.success(
-          newAdStatus ? "Ticket is now Featured!" : "Advertisement Removed.",
-        );
-
-        // Update local state instantly
-        setTickets((prev) =>
-          prev.map((ticket) =>
-            ticket._id === id
-              ? { ...ticket, isAdvertised: newAdStatus }
-              : ticket,
-          ),
-        );
-      } else {
-        toast.error("Failed to change advertisement status.");
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error("A network error occurred.");
-    } finally {
-      setAdProcessingId(null);
     }
   };
 
@@ -135,19 +86,13 @@ export default function ManageTicketsClient({ initialTickets }) {
               {/* 2. Ticket Image & Core Details */}
               <td className="px-6 py-6 align-top">
                 <div className="flex gap-4 items-start">
-                  <div className="w-20 h-20 shrink-0 rounded-xl bg-[#0b1d30] overflow-hidden border border-white/5 shadow-md relative">
+                  <div className="w-20 h-20 shrink-0 rounded-xl bg-[#0b1d30] overflow-hidden border border-white/5 shadow-md">
                     <img
                       src={ticket.image}
                       alt={ticket.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
-                    {/* Visual indicator if ticket is currently advertised */}
-                    {ticket.isAdvertised && (
-                      <div className="absolute top-0 right-0 bg-[#00ADB5] text-[#091624] p-1 rounded-bl-lg shadow-lg">
-                        <FaStar size={10} />
-                      </div>
-                    )}
                   </div>
                   <div>
                     <span className="text-[9px] font-black uppercase tracking-widest bg-[#124170]/40 border border-[#1a3d61] text-[#AAFFC7] px-2 py-0.5 rounded-md flex items-center gap-1 w-max mb-2">
@@ -176,6 +121,7 @@ export default function ManageTicketsClient({ initialTickets }) {
                       })}
                     </span>
                   </div>
+
                   {ticket.perks && ticket.perks.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 max-w-[200px]">
                       {ticket.perks.map((perk, idx) => (
@@ -217,16 +163,6 @@ export default function ManageTicketsClient({ initialTickets }) {
               {/* 5. Status */}
               <td className="px-6 py-6 align-top">
                 <StatusBadge status={ticket.status} />
-
-                {/* Text Indicator for Advertisement */}
-                {ticket.isAdvertised && (
-                  <div className="mt-3 inline-flex items-center gap-1.5 px-2 py-1 bg-[#00ADB5]/10 border border-[#00ADB5]/20 rounded-md">
-                    <FaBullhorn className="text-[#00ADB5]" size={10} />
-                    <span className="text-[9px] font-bold text-[#00ADB5] uppercase tracking-widest">
-                      Featured Ad
-                    </span>
-                  </div>
-                )}
               </td>
 
               {/* 6. Actions */}
@@ -240,7 +176,7 @@ export default function ManageTicketsClient({ initialTickets }) {
                     }
                     isLoading={processingId === ticket._id}
                     onPress={() => handleStatusChange(ticket._id, "approved")}
-                    className="w-28 bg-[#00ADB5]/10 text-[#00ADB5] border border-[#00ADB5]/30 hover:bg-[#00ADB5] hover:text-[#091624] font-bold uppercase tracking-widest text-[10px] transition-all rounded-lg justify-start"
+                    className="w-24 bg-[#00ADB5]/10 text-[#00ADB5] border border-[#00ADB5]/30 hover:bg-[#00ADB5] hover:text-[#091624] font-bold uppercase tracking-widest text-[10px] transition-all rounded-lg justify-start"
                     startContent={
                       processingId !== ticket._id && <FaCheck size={10} />
                     }
@@ -255,36 +191,13 @@ export default function ManageTicketsClient({ initialTickets }) {
                     }
                     isLoading={processingId === ticket._id}
                     onPress={() => handleStatusChange(ticket._id, "rejected")}
-                    className="w-28 bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest text-[10px] transition-all rounded-lg justify-start"
+                    className="w-24 bg-red-500/10 text-red-500 border border-red-500/30 hover:bg-red-500 hover:text-white font-bold uppercase tracking-widest text-[10px] transition-all rounded-lg justify-start"
                     startContent={
                       processingId !== ticket._id && <FaTimes size={10} />
                     }
                   >
                     Reject
                   </Button>
-
-                  {/* Advertisement Toggle Button (Only available for Approved tickets) */}
-                  {ticket.status === "approved" && (
-                    <Button
-                      size="sm"
-                      isLoading={adProcessingId === ticket._id}
-                      onPress={() =>
-                        handleAdvertiseToggle(ticket._id, ticket.isAdvertised)
-                      }
-                      className={`w-28 mt-2 font-bold uppercase tracking-widest text-[9px] transition-all rounded-lg justify-start ${
-                        ticket.isAdvertised
-                          ? "bg-zinc-500/10 text-zinc-400 border border-zinc-500/30 hover:bg-zinc-500 hover:text-white"
-                          : "bg-amber-500/10 text-amber-500 border border-amber-500/30 hover:bg-amber-500 hover:text-[#091624]"
-                      }`}
-                      startContent={
-                        adProcessingId !== ticket._id && (
-                          <FaBullhorn size={10} />
-                        )
-                      }
-                    >
-                      {ticket.isAdvertised ? "Remove Ad" : "Advertise"}
-                    </Button>
-                  )}
                 </div>
               </td>
             </tr>

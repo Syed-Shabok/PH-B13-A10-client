@@ -16,13 +16,18 @@ export default async function TransactionHistoryPage() {
   }
 
   return (
-    <div className="p-6 relative overflow-hidden min-h-screen">
+    <div className="min-h-screen w-full bg-slate-50 dark:bg-[#091624] px-6 py-12 relative overflow-hidden transition-colors duration-300">
       <DashboardHeading
         title="Transaction History"
         description="Review your past billing receipts, payment statuses, and ticket expenditures."
       />
 
+      {/* Client layout section */}
       <TransactionHistoryClient transactions={transactions} />
+
+      {/* Matching Background Ambient Glow Objects */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#00ADB5]/10 dark:bg-[#124170]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#67C090]/10 dark:bg-[#AAFFC7]/5 rounded-full blur-3xl pointer-events-none" />
     </div>
   );
 }

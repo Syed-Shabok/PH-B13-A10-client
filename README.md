@@ -46,12 +46,12 @@ A comprehensive, full-stack Online Ticket Booking Platform built using the MERN 
 ### Homepage & Advertisement Section
 
 _Showcases exactly 6 high-priority featured routes curated dynamically by the platform administration._
-![Homepage Ads Placeholder](https://placehold.co/1200x600/091624/00ADB5?text=Tikify+Homepage+Featured+Ads+Preview)
+![Homepage Ads Placeholder](https://i.ibb.co/HpXCHb6m/homepage-mockup.png)
 
 ### Advanced Ticket Discovery Interface
 
 _Interactive view featuring real-time multi-variable parameter search, category filtering, price sorting, and dynamic server-side pagination._
-![All Tickets Page Placeholder](https://placehold.co/1200x600/091624/00ADB5?text=All+Tickets+Search+and+Pagination+Interface)
+![All Tickets Page Placeholder](https://i.ibb.co/DDLrxsSX/all-tickets.png)
 
 </details>
 
@@ -62,17 +62,17 @@ _Interactive view featuring real-time multi-variable parameter search, category 
 ### Passenger Hub
 
 _Track incoming reservation statuses, view interactive departure countdown clocks, and execute instant billing checkout using the Stripe interface._
-![Passenger Hub Placeholder](https://placehold.co/1200x600/091624/00ADB5?text=Passenger+Dashboard+and+Stripe+Checkout)
+![Passenger Hub Placeholder](https://i.ibb.co/Z6P4ngkz/passenger.png)
 
 ### Vendor Control Center
 
 _Streamlined asset forms integrated with ImgBB storage APIs, custom perk selection checklists, and chart-visualized business metrics mapping net revenues._
-![Vendor Suite Placeholder](https://placehold.co/1200x600/091624/00ADB5?text=Vendor+Inventory+and+Revenue+Charts)
+![Vendor Suite Placeholder](https://i.ibb.co/TGJMx2W/modern-browser-mockup.png)
 
 ### Admin Surveillance Panel
 
 _Global route verification management, user role promotion panels, homepage ad slot curators, and absolute operator restriction switches._
-![Admin Dashboard Placeholder](https://placehold.co/1200x600/091624/00ADB5?text=Admin+Security+and+Marketing+Management)
+![Admin Dashboard Placeholder](https://i.ibb.co/yFvcYzLR/modern-browser-mockup-1.png)
 
 </details>
 
